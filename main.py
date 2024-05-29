@@ -7,7 +7,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 options = webdriver.ChromeOptions()
-options.add_argument("--window-size=1920,1080")
 options.add_argument("--headless")
 options.add_argument("--disable-gpu")
 options.add_argument("--disable-dev-shm-usage")
