@@ -1,21 +1,18 @@
 import time
 
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from credential import Credential
 
-from selenium.webdriver.firefox.options import Options as FireFoxOptions
+options = webdriver.ChromeOptions()
+options.add_argument("--window-size=1920,1080")
+options.add_argument("--headless")
+options.add_argument("--disable-gpu")
+options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
+browser = webdriver.Chrome(options=options)
 
-# Configure Chrome options
-firefox_options = FireFoxOptions()
-firefox_options.headless = True
-
-# Path to your ChromeDriver
-executable_path = Credential().get_gecko_path()
-
-# Initiate the browser
-browser = webdriver.Firefox(executable_path=executable_path, options=firefox_options)
+browser.get("https://www.google.com")
+print(browser.title)
 
 # Define your search parameters
 skill = "project manager solar"
