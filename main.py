@@ -5,18 +5,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from credential import Credential
 
+from selenium.webdriver.firefox.options import Options as FireFoxOptions
 
 # Configure Chrome options
-chrome_options = Options()
-chrome_options.add_argument("--disable-gpu")  # Disables GPU hardware acceleration
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
+firefox_options = FireFoxOptions()
+firefox_options.headless = True
 
 # Path to your ChromeDriver
-executable_path = Credential().get_chrome_path()
+executable_path = Credential().get_gecko_path()
 
 # Initiate the browser
-browser = webdriver.Chrome(executable_path=executable_path, options=chrome_options)
+browser = webdriver.Firefox(executable_path=executable_path, options=firefox_options)
 
 # Define your search parameters
 skill = "project manager solar"
@@ -33,7 +32,7 @@ keywords = ["home office", "remote work", "telecommute", "work from home", "remo
             "homebased role", "homebased work", "homebased working", "homebased worker", "homebased employee",
             "homebased team", "homebased environment", "home based job", "home based position",
             "home based opportunity", "home based role", "home based work", "home based working", "home based worker",
-            "home based employee", "home based team", "home based environment", "homeoffice"]
+            "home based employee", "home based team", "home based environment", "homeoffice", "home-office"]
 
 url = f"https://de.indeed.com/jobs?q={skill}&l={place}"
 browser.get(url)

@@ -14,3 +14,7 @@ class Credential():
 
     def get_chrome_path(self):
         return self.obj["chrome_path"]
+
+    def get_gecko_path(self):
+        return self.obj["gecko_path"]
+
