@@ -2,6 +2,9 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 options = webdriver.ChromeOptions()
 options.add_argument("--window-size=1920,1080")
@@ -9,8 +12,8 @@ options.add_argument("--headless")
 options.add_argument("--disable-gpu")
 options.add_argument(
     "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
-browser = webdriver.Chrome(options=options)
 
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 browser.get("https://www.google.com")
 print(browser.title)
 
