@@ -44,7 +44,7 @@ keywords = ["home office", "remote work", "telecommute", "work from home", "remo
 
 url = f"https://de.indeed.com/jobs?q={skill}&l={place}"
 browser.get(url)
-
+browser.save_screenshot("indeed.png")
 time.sleep(5)  # Allow some time for the page to load
 
 jobs = browser.find_elements(By.CLASS_NAME, 'tapItem')
