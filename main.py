@@ -3,7 +3,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from credential import Credential
+#from credential import Credential
 from webdriver_manager.firefox import GeckoDriverManager
 
 from selenium.webdriver.firefox.options import Options as FireFoxOptions
@@ -21,7 +21,7 @@ firefox_options.add_argument("--disable-popup-blocking")
 
 
 # Path to your ChromeDriver
-executable_path = Credential().get_gecko_path()
+#executable_path = Credential().get_gecko_path()
 browser = webdriver.Firefox(executable_path=GeckoDriverManager().install(),options=firefox_options)
 
 
