@@ -4,18 +4,26 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from credential import Credential
+from webdriver_manager.firefox import GeckoDriverManager
 
 from selenium.webdriver.firefox.options import Options as FireFoxOptions
 
 # Configure Chrome options
 firefox_options = FireFoxOptions()
 firefox_options.headless = True
+firefox_options.add_argument("--no-sandbox")
+firefox_options.add_argument("--disable-dev-shm-usage")
+firefox_options.add_argument("--disable-gpu")
+firefox_options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/")
+firefox_options.add_argument("--auto-open-devtools-for-tabs")
+firefox_options.add_argument("--disable-popup-blocking")
+
 
 # Path to your ChromeDriver
 executable_path = Credential().get_gecko_path()
+browser = webdriver.Firefox(executable_path=GeckoDriverManager().install(),options=firefox_options)
 
-# Initiate the browser
-browser = webdriver.Firefox(executable_path=executable_path, options=firefox_options)
 
 # Define your search parameters
 skill = "project manager solar"
