@@ -2,9 +2,7 @@ import time
 
 import undetected_chromedriver as uc
 
-uc.install(
-    executable_path='/usr/bin/chromedriver',
-)
+
 options = uc.ChromeOptions()
 options.headless = True
 browser = uc.Chrome(options=options)
