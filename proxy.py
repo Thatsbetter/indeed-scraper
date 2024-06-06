@@ -24,6 +24,10 @@ class Proxy():
                 proxy['ip_data']['country'].lower() == country.lower() and proxy[
                     'protocol'].lower() == protocol.lower()]
 
+    def get_http_and_false_ssl(self):
+        return [proxy for proxy in self.dict['proxies'] if
+                proxy['protocol'].lower() == 'http' and proxy['ssl'] == False and proxy['anonymity'].lower() == 'elite']
+
     @staticmethod
     def is_proxy_working(proxy):
         proxy_link = 'http://{}'.format(proxy)
