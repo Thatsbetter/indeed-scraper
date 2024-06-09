@@ -11,10 +11,6 @@ class Credential():
 
     def get_telegram_token(self):
         return self.obj["telegram_api_token"]
-
-    def get_chrome_path(self):
-        return self.obj["chrome_path"]
-
-    def get_gecko_path(self):
-        return self.obj["gecko_path"]
+    def get_channel_id(self):
+        return self.obj["channel_id"]
 
