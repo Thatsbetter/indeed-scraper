@@ -1,6 +1,8 @@
+import logging
 import random
 import time
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
@@ -9,6 +11,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
 from proxy import Proxy
+from telegram import Telegram
+
+logging.basicConfig(filename='error.log', level=logging.ERROR,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
+found_jobs = []
 
 
 def does_it_connect_to_indeed(browser):
@@ -31,18 +38,18 @@ def validate_proxy(proxy_link):
 
 def get_indeed_proxies():
     indeed_proxies = []
-    connected_proxies = Proxy().get_http_and_false_ssl()[:25]
+    connected_proxies = Proxy().get_http_and_false_ssl()
     for connect in connected_proxies:
         proxy_link = f"{connect['ip']}:{connect['port']}"
         if validate_proxy(proxy_link):
             indeed_proxies.append(proxy_link)
-        if len(indeed_proxies) > 5:
+        if len(indeed_proxies) > 2:
             break
 
     if indeed_proxies:
         return indeed_proxies
     else:
-        print("No proxies found.")
+        logging.error("No proxies found.")
         time.sleep(400)
         return get_indeed_proxies()
 
@@ -68,15 +75,13 @@ def get_job_links(skill, place, browser, page=1):
     try:
         browser.get(url)
         time.sleep(5)
-        browser.save_screenshot(f"indeed_{page}.png")
-        # WebDriverWait(browser, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'tapItem')))
         jobs = browser.find_elements(By.CLASS_NAME, 'tapItem')
         for job in jobs:
             job_link_element = job.find_element(By.CSS_SELECTOR, 'a.jcs-JobTitle')
             job_link = job_link_element.get_attribute('href')
             job_links.append(job_link)
     except Exception as e:
-        print(f"Error loading page: {str(e)}")
+        logging.error(f"Error loading page: {str(e)}")
     return job_links
 
 
@@ -93,15 +98,15 @@ def scrape_job_details(browser, job_links, home_office_keyword, job_requirements
 
             if (any(keyword in text_content for keyword in home_office_keyword) and
                     any(keyword in text_content for keyword in job_requirements_keyword)):
-                print(f"Job Title: {job_title}")
-                print(f"Job Link: {link}")
-                print("--------------------------------------------------------")
-
+                return dict(job_title=job_title, link=link)
+            else:
+                return None
         except Exception as e:
-            print(f"Error processing job: {e}")
+            logging.error(f"Error scraping job details: {str(e)}")
+            return None
 
 
-def main():
+def search_jobs():
     home_office_keyword = ['home based working', 'home based', 'homebased', 'remote working', 'remote environment',
                            'remote office', 'home office team', 'home-based team', 'homebased opportunity',
                            'homeoffice',
@@ -122,7 +127,7 @@ def main():
                                 "wirtschaftsingenieurin", "projektmanagement", "projektmanager",
                                 "projektmanagerin", "projektmanagement", "project management", "project manager",
                                 "Nachhaltigkeit", "nachhaltigkeitsmanagement", "projektmanagement", "projektmanager",
-                                "projektmanagerin", "manager", "management", "sustainability",
+                                "projektmanagerin", "manager", "management", "sustainability", "manager", "managerin",
                                 "renewable energy", "solar", "green operations", "green energy", "solar energy"]
 
     skills = [
@@ -140,19 +145,32 @@ def main():
     places = ["hamburg", "deutschland"]
 
     proxy_list = get_indeed_proxies()
-    print(f"Found {len(proxy_list)} working proxies.")
     job_links = []
+    matched_jobs = []
     for skill in skills:
         for place in places:
             time.sleep(5)
             for page in range(1, 5):
                 with initialize_browser(random.choice(proxy_list)) as browser:
                     job_links = get_job_links(skill, place, browser, page)
-                print(f"Found {len(job_links)} job links.")
+                logging.debug(f"Found {len(job_links)} job links.")
     for job_link in job_links:
         with initialize_browser(random.choice(proxy_list)) as browser:
-            scrape_job_details(browser, job_link, home_office_keyword, job_requirements_keyword)
+            scraped_job = scrape_job_details(browser, job_link, home_office_keyword, job_requirements_keyword)
+            if scraped_job:
+                matched_jobs.append(scraped_job)
+    for job in matched_jobs:
+        if job not in found_jobs:
+            Telegram().send_message(f"🌟 New job found! 🌟\n\n{job['job_title']}\n{job['link']}")
+            found_jobs.append(job)
 
 
-if __name__ == "__main__":
-    main()
+# Initialize scheduler
+scheduler = BackgroundScheduler()
+# Run the search_jobs function every day at 7am, 2pm, and 6pm
+scheduler.add_job(search_jobs, 'cron', hour='7,14,18', minute=0, second=0)
+scheduler.start()
+
+# Keep the program running
+while True:
+    time.sleep(1)
