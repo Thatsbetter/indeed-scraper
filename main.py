@@ -88,6 +88,7 @@ def get_job_links(skill, place, browser, page=1):
 def scrape_job_details(browser, job_links, home_office_keyword, job_requirements_keyword):
     for link in job_links:
         try:
+            link = link.replace('https', 'http')
             browser.get(link)
             WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'h1.jobsearch-JobInfoHeader-title span')))
